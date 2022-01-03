@@ -1,0 +1,27 @@
+version: "3.9"
+
+networks:
+  crud-network:
+    driver: bridge
+
+services:
+  crud-postgres:
+    image: postgres
+    environment:
+      POSTGRES_PASSWORD: "123456"
+    ports:
+      - "5432:5432"
+    networks:
+      - crud-network
+
+  crud-api:
+    image: eduardo35/crud-tlss
+    command: [ "/wait-for-it.sh", "crud-postgres:5432", "-t", "30", "--", "java", "-jar", "api.jar" ]
+    environment:
+      DB_HOST: crud-postgres
+    ports:
+      - "8080:8080"
+    networks:
+      - crud-network
+    depends_on:
+      - crud-postgres
